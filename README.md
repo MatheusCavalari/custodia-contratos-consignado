@@ -1,164 +1,79 @@
-# Documentação da API Bancária
+## Custódia de Contratos Consignado
 
-Esta é a documentação da API bancária RESTful que permite realizar operações bancárias, como criar clientes, realizar transferências e obter informações de conta.
+O microserviço Custódia de Contratos Consignado gerencia e armazena os contratos de empréstimos consignados, garantindo a integridade e disponibilidade das informações.
 
-# API Bancária RESTful
+### Como Utilizar
 
-Esta API bancária RESTful fornece recursos para criar clientes, realizar transferências entre contas, e obter informações sobre clientes e transferências. Ela é desenvolvida com base nas melhores práticas de design de APIs RESTful e utiliza tecnologias modernas para atender às necessidades de um sistema bancário.
+1. **Clonar o Repositório**:
+   ```sh
+    git clone https://github.com/MatheusCavalari/custodia-contrato-consignado.git
 
-## Boas Práticas Utilizadas
+2. **Executar a Aplicação:**:
+- **Porta do Servidor: 8084**
+- **Banco de Dados: H2 em memória**
+   ```sh
+    mvn spring-boot:run
 
-- **Versionamento de API**: A API segue uma estratégia de versionamento no caminho (`/api/v1`) para garantir a compatibilidade com versões futuras.
-- **Uso de Verbos HTTP**: Os métodos HTTP (GET, POST) são utilizados de acordo com suas semânticas para operações de leitura e escrita, respectivamente.
-- **URI Semântica**: As URIs são projetadas de forma semântica, facilitando a compreensão dos recursos e operações.
-- **Respostas HTTP Adequadas**: Respostas HTTP apropriadas, como códigos de status 2xx para sucesso e 4xx para erros do cliente, são fornecidas.
-- **Documentação OpenAPI**: A API é documentada usando SpringDoc OpenAPI para fornecer informações detalhadas sobre os recursos, endpoints e modelos. (http://localhost:port/swagger-ui/index.html)
-- **Testes Unitários**: São realizados testes unitários para garantir a qualidade do código e a funcionalidade correta da API.
+### Endpoints
 
-Esta API é uma solução eficiente e segura para operações bancárias, seguindo as melhores práticas e padrões de desenvolvimento de APIs RESTful. Ela oferece uma maneira simples e confiável de gerenciar contas e transferências.
-
-
-## Endpoints
-
-### Clientes
-
-#### Criar um Cliente
-
-- **Método**: `POST`
-- **Rota**: `/api/v1/cliente`
-- **Descrição**: Cria um novo cliente com as informações fornecidas.
-- **Exemplo de Requisição**:
-  ```json
-  {
-      "nome": "Nome do Cliente",
-      "numeroConta": "123456",
-      "saldoConta": 1000.0
-  }
-- **Exemplo de Resposta**:
-  ```json
-  {
-    "id": 1,
-    "nome": "Nome do Cliente",
-    "numeroConta": "123456",
-    "saldoConta": 1000.0
-  }
-
-#### Obter Todos os Clientes
-
-- **Método**: `GET`
-- **Rota**: `/api/v1/cliente/obterTodosClientes`
-- **Descrição**: Obtém a lista de todos os clientes cadastrados.
-- **Exemplo de Resposta**:
-  ```json
-  [
+1. **Criar Contrato**: Endpoint para criar um novo contrato.
+  - **URL**: `/v1/contrato`
+  - **Método**: `POST`
+  - **Corpo da Requisição**:
+    ```json
     {
-        "id": 1,
-        "nome": "Nome do Cliente 1",
-        "numeroConta": "123456",
-        "saldoConta": 1000.0
-    },
-    {
-        "id": 2,
-        "nome": "Nome do Cliente 2",
-        "numeroConta": "789012",
-        "saldoConta": 2000.0
+      "dataContrato": "yyyy-MM-dd",
+      "idSimulacao": 1
     }
-  ]
+    ```
+  - **Resposta de Sucesso**:
+    - Código: `201 CREATED`
+    - Corpo: Contrato criado
 
-#### Obter Todos os Clientes
+2. **Listar Contratos**: Endpoint para listar todos os contratos.
+  - **URL**: `/v1/contrato`
+  - **Método**: `GET`
+  - **Resposta de Sucesso**:
+    - Código: `200 OK`
+    - Corpo: Lista de contratos
 
-- **Método**: `GET`
-- **Rota**: `/api/v1/cliente/conta/{numeroConta}`
-- **Descrição**: Obtém informações de um cliente com base no número da conta.
-- **Exemplo de Resposta**:
-  ```json
-  {
-    "id": 1,
-    "nome": "Nome do Cliente",
-    "numeroConta": "123456",
-    "saldoConta": 1000.0
-  }
+3. **Buscar Contrato por ID**: Endpoint para buscar um contrato pelo ID.
+  - **URL**: `/v1/contrato/{id}`
+  - **Método**: `GET`
+  - **Parâmetros de URL**: `{id}` - ID do contrato a ser buscado
+  - **Resposta de Sucesso**:
+    - Código: `200 OK`
+    - Corpo: Contrato encontrado
 
-### Transferências
+### Dependências
 
-#### Realizar uma Transferência
+- Spring Boot Web
+- Spring Boot DevTools
+- Spring Boot Starter Test
+- Spring Boot Starter Data JPA
+- H2 Database
+- Lombok
+- Springdoc OpenAPI
+- JUnit
 
-- **Método**: `POST`
-- **Rota**: `/api/v1/transferencia`
-- **Descrição**: Realiza uma transferência entre duas contas.
-- **Exemplo de Requisição**:
-  ```json
-  {
-    "contaOrigem": "123456",
-    "contaDestino": "789012",
-    "valor": 500.0
-  }
-- **Exemplo de Resposta**:
-  ```json
-  {
-    "id": 1,
-    "contaOrigem": "123456",
-    "contaDestino": "789012",
-    "valor": 500.0,
-    "data": "2023-10-19T15:30:00",
-    "sucesso": true
-  }
+### Arquitetura Hexagonal
 
-#### Obter Transferências
+O microserviço Custódia de Contratos Consignado segue a arquitetura hexagonal (ou ports and adapters), que separa a lógica de negócios da implementação técnica. Nessa arquitetura, as camadas são organizadas da seguinte forma:
 
-- **Método**: `GET`
-- **Rota**: `/api/v1/transferencia/{numeroConta}`
-- **Descrição**: Obtém a lista de todas as transferências relacionadas a uma conta.
-- **Exemplo de Resposta**:
-  ```json
-  [
-    {
-        "id": 1,
-        "contaOrigem": "123456",
-        "contaDestino": "789012",
-        "valor": 500.0,
-        "data": "2023-10-19T15:30:00",
-        "sucesso": true
-    },
-    {
-        "id": 2,
-        "contaOrigem": "123456",
-        "contaDestino": "789012",
-        "valor": 300.0,
-        "data": "2023-10-19T15:45:00",
-        "sucesso": true
-    }
-  ]
+- **Domínio**: Contém as entidades de negócio, os serviços e as interfaces que definem as operações do domínio.
+- **Aplicação**: Implementa a lógica de negócios usando os serviços do domínio.
+- **Adaptadores**: São responsáveis por conectar o domínio à infraestrutura externa, como bancos de dados e serviços externos.
 
-## Tecnologias Utilizadas
+### Versão do Java
 
-- **Spring Boot 3.0.12**: Framework para desenvolvimento de aplicativos Java.
-- **Java 17**: Linguagem de programação.
-- **H2 Database**: Banco de dados em memória para desenvolvimento.
-- **Lombok**: Biblioteca para reduzir a verbosidade do código.
-- **ModelMapper**: Biblioteca para mapeamento de objetos.
-- **SpringDoc OpenAPI**: Biblioteca para geração de documentação OpenAPI.
-- **JUnit 5**: Framework para testes.
+O microserviço foi desenvolvido utilizando Java 17, aproveitando as últimas funcionalidades e melhorias da linguagem.
 
-## Pré-requisitos
+Framework para desenvolvimento: Spring Boot 3.0.12.
 
-Para executar esta aplicação em sua máquina, você precisará ter o seguinte instalado:
+### Gerenciamento de Dependências
 
-- **Java Development Kit (JDK) 17**: Certifique-se de ter o JDK 17 instalado em sua máquina. Você pode fazer o download em [AdoptOpenJDK](https://adoptopenjdk.net/) ou [OpenJDK](https://openjdk.java.net/).
-
-- **Maven**: Esta aplicação utiliza o Maven como sistema de gerenciamento de construção. Se você não tiver o Maven instalado, você pode baixá-lo em [Maven Downloads](https://maven.apache.org/download.cgi).
-
-Certifique-se de configurar corretamente as variáveis de ambiente do Java e do Maven em seu sistema.
+O Maven foi utilizado como gerenciador de dependências e para realizar o build da aplicação. Ele simplifica o processo de compilação e gerenciamento de dependências, facilitando o desenvolvimento e a manutenção do projeto.
 
 ## Autor
 
 Matheus Cavalari Barbosa
-
-
-
-
-
-
-
-  
-
